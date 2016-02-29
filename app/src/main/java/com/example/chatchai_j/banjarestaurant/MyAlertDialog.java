@@ -14,7 +14,7 @@ public class MyAlertDialog {
         builder.setIcon(R.drawable.icon_question);
         builder.setTitle(strTitle);
         builder.setMessage(strMessage);
-        builder.setCancelable(false);   // ถ้า pop ใน unknow กดไม่ได้
+        builder.setCancelable(false);   // ถ้า pop ใน unknown กดไม่ได้
         builder.setPositiveButton("โอเค", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
