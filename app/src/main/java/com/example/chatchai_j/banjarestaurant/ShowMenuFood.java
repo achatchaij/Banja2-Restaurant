@@ -1,9 +1,15 @@
 package com.example.chatchai_j.banjarestaurant;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -14,6 +20,7 @@ public class ShowMenuFood extends AppCompatActivity {
     private TextView showOfficerTextView;
     private Spinner deskSpinner;
     private ListView foodListView;
+    private String officerString, deskString, orderFoodString, amountString;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,9 +29,52 @@ public class ShowMenuFood extends AppCompatActivity {
 
         //Bind Widget
         bindWidget();
+
+        //ShowView
+        showView();
+
+        //Create Desk Spinner
+        createDeskSpinner();
+
         //Create Food ListView
         createFoodListView();
     }   // Main Method
+
+    public void clickReadOrder(View view) {
+        Intent intent = new Intent(ShowMenuFood.this, ReadOrderListView.class);
+        intent.putExtra("Officer", officerString);
+        intent.putExtra("Desk", deskString);
+        startActivity(intent);
+            }
+    private void createDeskSpinner() {
+
+        final String[] deskStrings = {"โต๊ที่ 1","โต๊ที่ 2","โต๊ที่ 3","โต๊ที่ 4","โต๊ที่ 5"
+                ,"โต๊ที่ 6","โต๊ที่ 7","โต๊ที่ 8","โต๊ที่ 9","โต๊ที่ 10"};
+        ArrayAdapter<String> stringArrayAdapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_list_item_1,deskStrings);
+        deskSpinner.setAdapter(stringArrayAdapter);
+
+        deskSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                deskString = deskStrings[i];
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                deskString = deskStrings[0];
+
+            }
+        });
+    }// createDeskSpinner
+
+    private void showView() {
+
+        officerString = getIntent().getStringExtra("Officer");
+        showOfficerTextView.setText(officerString);
+
+    }// ShowView
 
     private void createFoodListView() {
 
@@ -33,7 +83,7 @@ public class ShowMenuFood extends AppCompatActivity {
         Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM  " + MyManage.food_table, null);
         cursor.moveToFirst();
 
-        String[] foodStrings = new String[cursor.getCount()];
+        final String[] foodStrings = new String[cursor.getCount()];
         String[] priceStrings = new String[cursor.getCount()];
         String[] sourceStrings = new String[cursor.getCount()];
 
@@ -41,13 +91,50 @@ public class ShowMenuFood extends AppCompatActivity {
 
             foodStrings[i] = cursor.getString(cursor.getColumnIndex(MyManage.column_food));
             priceStrings[i] = cursor.getString(cursor.getColumnIndex(MyManage.column_Price));
-            sourceStrings[i] = cursor.getString(cursor.getColumnIndex(MyManage.colunm_source));
+            sourceStrings[i] = cursor.getString(cursor.getColumnIndex(MyManage.column_source));
 
 
             cursor.moveToNext();
         }
         cursor.close();   // คืนหน่วยความจำ
+
+        FoodAdapter foodAdapter = new FoodAdapter(ShowMenuFood.this,
+                foodStrings, priceStrings, sourceStrings);
+        foodListView.setAdapter(foodAdapter);
+
+        foodListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                orderFoodString = foodStrings[i];
+                findAmount();
+
+            }
+        });
+
     }// createFoodListView
+
+    private void findAmount() {
+        CharSequence[] charSequences = {"1 set","2 set","3 set","4 set","5 set"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(orderFoodString);
+        builder.setSingleChoiceItems(charSequences, -1, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                amountString = Integer.toString(i + 1);
+                addOrderToSQLite();
+                dialogInterface.dismiss();
+            }
+        });
+        builder.setCancelable(false);
+        builder.show();
+
+    }// findAmount
+
+    private void addOrderToSQLite() {
+        MyManage myManage = new MyManage(this);
+        myManage.addOrder(officerString, deskString, orderFoodString, amountString);
+
+    }
 
     private void bindWidget() {
         showOfficerTextView = (TextView) findViewById(R.id.textView);

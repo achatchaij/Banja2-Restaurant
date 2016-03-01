@@ -8,7 +8,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.chatchai_j.banjarestaurant.ShowMenuFood"
-    android:background="@drawable/wall22">
+    android:background="@drawable/bg22">
 
     <LinearLayout
         android:orientation="horizontal"
@@ -37,5 +37,14 @@
         android:layout_height="wrap_content"
         android:id="@+id/listView"
         android:layout_below="@+id/linTop"
-        android:background="#96ffffff" />
+        android:background="#96ffffff"
+        android:layout_above="@+id/button2" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Read Order"
+        android:id="@+id/button2"
+        android:layout_alignParentBottom="true"
+        android:onClick="clickReadOrder" />
 </RelativeLayout>

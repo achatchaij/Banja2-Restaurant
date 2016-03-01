@@ -167,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
                         case 0:
                             //For userTABLE
                             String strUser = jsonObject.getString(MyManage.column_user);
-                            String strPass = jsonObject.getString(MyManage.conlumn_pass);
+                            String strPass = jsonObject.getString(MyManage.column_pass);
                             String strName = jsonObject.getString(MyManage.column_name);
 
                             myManage.addUser(strUser, strPass, strName);
@@ -177,7 +177,7 @@ public class MainActivity extends AppCompatActivity {
                             //For foodTABLE
                             String strFood = jsonObject.getString(MyManage.column_food);
                             String strPrice = jsonObject.getString(MyManage.column_Price);
-                            String strSource = jsonObject.getString(MyManage.colunm_source);
+                            String strSource = jsonObject.getString(MyManage.column_source);
 
                             myManage.addFood(strFood, strPrice, strSource);
 
