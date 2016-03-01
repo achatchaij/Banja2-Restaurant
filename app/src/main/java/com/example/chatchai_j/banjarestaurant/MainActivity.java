@@ -1,5 +1,6 @@
 package com.example.chatchai_j.banjarestaurant;
 
+import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
@@ -7,6 +8,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -48,6 +50,11 @@ public class MainActivity extends AppCompatActivity {
 
     }   // Main Method
 
+    private void bindWidget() {
+        userEditText = (EditText) findViewById(R.id.editText);
+        passwordEditText = (EditText) findViewById(R.id.editText2);
+    }
+
 
     public void clickLogin(View view) {
         userString = userEditText.getText().toString().trim();
@@ -59,16 +66,47 @@ public class MainActivity extends AppCompatActivity {
             myAlertDialog.myDialog(MainActivity.this, "มีช่องว่าง", "กรุณากรอกช่องว่างครับ");
         } else {
             //No Space
+    checkUser();
 
         } // if
 
     }// clickLogin
 
-    private void bindWidget() {
-        userEditText = (EditText) findViewById(R.id.editText);
-        passwordEditText = (EditText) findViewById(R.id.editText2);
+    private void checkUser() {
+        try {
+
+            String[] myResultStrings = myManage.searchUser(userString);
+            Log.d("banja", "Name = " + myResultStrings[3]);
+
+            //Check Password
+            if (passwordString.equals(myResultStrings[2])) {
+                welcome(myResultStrings[3]);
+            } else {
+
+                MyAlertDialog myAlertDialog = new MyAlertDialog();
+                myAlertDialog.myDialog(MainActivity.this,
+                        "Password Fails",
+                        "Please Try Again Password False");
+
+                       }
+
+
+        } catch (Exception e) {
+            MyAlertDialog myAlertDialog = new MyAlertDialog();
+            myAlertDialog.myDialog(MainActivity.this, "ไม่มี User", "ไม่มี " + userString + " ในฐานข้อมูลของเรา");
+
+        }
+    }// checkUser
+
+    private void welcome(String myResultString) {
+        Toast.makeText(MainActivity.this,"ยินดีต้อนรับ" + myResultString,Toast.LENGTH_SHORT).show();
+
+        Intent intent = new Intent(MainActivity.this, ShowMenuFood.class);
+        intent.putExtra("Officer", myResultString);
+        startActivity(intent);
 
     }
+
 
     private void synJSONtoSQLite() {
         //Connected http
